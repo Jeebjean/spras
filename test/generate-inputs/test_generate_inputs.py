@@ -20,7 +20,9 @@ algo_exp_file = {
     'bowtiebuilder': 'edges',
     'strwr': 'network',
     'rwr': 'network',
-    'responsenet': 'edges'
+    'responsenet': 'edges',
+    'responsenet': 'edges',
+    'local_neighborhood': 'network'
 }
 
 
