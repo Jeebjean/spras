@@ -81,3 +81,9 @@
    :caption: STRWR
 
    strwr
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Local Neighborhood
+
+   local-neighborhood
