@@ -63,7 +63,8 @@ class LocalNeighborhood(PRM[Empty]):
         Run Local Neighborhood inside its Docker container.
         """
         if not container_settings:
-            container_settings = ProcessedContainerSettings()
+            from spras.config import config as global_config
+            container_settings = global_config.config.container_settings
         LocalNeighborhood.validate_required_run_args(inputs)
 
         work_dir = '/local_neighborhood'

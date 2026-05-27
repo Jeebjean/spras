@@ -13,6 +13,7 @@ config.init_from_file("config/config.yaml")
 SPRAS_ROOT = Path(__file__).parent.parent.parent.absolute()
 sys.path.append(str(Path(SPRAS_ROOT, 'docker-wrappers', 'LocalNeighborhood')))
 from local_neighborhood_alg import local_neighborhood
+from spras.local_neighborhood import LocalNeighborhood
 
 TEST_DIR = Path('test', 'LocalNeighborhood/')
 OUT_FILE = Path(TEST_DIR, 'output', 'ln-output.txt')
@@ -53,3 +54,35 @@ class TestLocalNeighborhood:
     # The tests above test the internal python code for local_neighborhood - can you
     # write the `missing_file` and `ln` tests above but for Docker using LocalNeighborhood,
     # and at least one for Singularity?
+
+    """
+    Run the LocalNeighborhood wrapper using Docker
+    """
+    def test_ln_docker(self):
+        out_file = Path(TEST_DIR, 'output', 'ln-output-wrapper-docker.txt')
+        out_file.unlink(missing_ok=True)
+        out_file.parent.mkdir(parents=True, exist_ok=True)
+
+        LocalNeighborhood.run(
+            inputs={
+                'network': Path(TEST_DIR, 'input', 'ln-network.txt'),
+                'nodes': Path(TEST_DIR, 'input', 'ln-nodes.txt'),
+            },
+            output_file=out_file,
+        )
+        assert out_file.exists(), 'Output file was not written by the wrapper'
+
+    """
+    Run the LocalNeighborhood wrapper using Docker with a missing input file
+    """
+    def test_ln_missing_docker(self):
+        out_file = Path(TEST_DIR, 'output', 'ln-output-missing-docker.txt')
+        out_file.unlink(missing_ok=True)
+        with pytest.raises(Exception):
+            LocalNeighborhood.run(
+                inputs={
+                    'network': Path(TEST_DIR, 'input', 'missing.txt'),
+                    'nodes': Path(TEST_DIR, 'input', 'ln-nodes.txt'),
+                },
+                output_file=out_file,
+            )

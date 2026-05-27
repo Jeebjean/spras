@@ -20,7 +20,7 @@ from spras.util import LoosePathLike
 
 algorithms: dict[str, type[PRM]] = {
     "allpairs": AllPairs,
-    "localneighborhood": LocalNeighborhood,
+    "local_neighborhood": LocalNeighborhood,
     "bowtiebuilder": BowTieBuilder,
     "diamond": DIAMOnD,
     "domino": DOMINO,

@@ -112,7 +112,7 @@ algorithms:
   - name: "allpairs"
     include: false
 
-  - name: "localneighborhood"
+  - name: "local_neighborhood"
     include: true
     
 
@@ -122,6 +122,9 @@ algorithms:
       run1:
         slice_threshold: 0.3
         module_threshold: 0.05
+
+  - name: "local_neighborhood"
+    include: true
 
   - name: "strwr"
     include: false
