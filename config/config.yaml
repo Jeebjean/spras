@@ -272,3 +272,19 @@ analysis:
     # adds evaluation per algorithm per dataset-goldstandard pair
     # evaluation per algorithm will not run unless ml include and ml aggregate_per_algorithm are set to true
     aggregate_per_algorithm: true
+  # Logistic PCA (LPCA) of the binary edge-by-run matrix, one embedding per algorithm
+  # only runs for algorithms with multiple parameter combinations chosen
+  lpca:
+    # run the LPCA analysis per algorithm
+    # LPCA needs enough observations to be meaningful
+    include: false
+    # number of principal components to compute
+    k: 2
+    # fixed value of the logisticPCA tuning parameter m, used when cv is false
+    m: 6
+    # if true, choose m by cross-validation; if false, use the fixed m above
+    cv: false
+    # matrix orientation given to LPCA:
+    #   false = edges x runs (observations are the edges)
+    #   true  = runs x edges (observations are the runs, mirroring the classic ml pca analysis)
+    transpose: false
