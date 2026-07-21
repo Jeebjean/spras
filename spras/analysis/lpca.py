@@ -6,7 +6,9 @@ from os import PathLike
 from pathlib import Path
 from typing import Iterable, Union
 
+import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 
 from spras.analysis.ml import summarize_networks
 from spras.config.container_schema import ProcessedContainerSettings
@@ -92,3 +94,45 @@ def run_lpca(
                           LPCA_WORK_DIR, None, container_settings)
 
     print(f'LPCA: Done! Scores saved to {output_scores}')
+
+def plot_lpca(scores_file: str, output_png: str, output_coord: str, labels: bool = True) -> None:
+    """
+    Creates a scatterplot of the first two LPCA principal components.
+    @param scores_file: path to the LPCA scores CSV file
+    @param output_png: path to save the scatterplot PNG
+    @param output_coord: path to save the PC coordinates
+    @param labels: if True, adds algorithm labels to the plot
+    """
+    scores = pd.read_csv(scores_file, index_col=0)
+
+    if scores.empty:
+        print('LPCA: Scores file is empty, skipping plot.')
+        return
+
+    # Extract algorithm names from the index
+    column_names = [idx.split('-')[-3] if '-' in idx else idx for idx in scores.index]
+
+    X = scores.values
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=column_names, s=70, ax=ax)
+
+    if labels:
+        for i, label in enumerate(scores.index):
+            ax.annotate(label, (X[i, 0], X[i, 1]), fontsize=6, alpha=0.7)
+
+    ax.set_xlabel('PC1')
+    ax.set_ylabel('PC2')
+    ax.set_title('Logistic PCA')
+
+    plt.tight_layout()
+
+    # Save PNG
+    Path(output_png).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_png, dpi=200)
+    plt.close()
+
+    # Save coordinates
+    coord_df = pd.DataFrame(X, columns=['PC1', 'PC2'], index=scores.index)
+    coord_df.to_csv(output_coord)
+    print(f'LPCA: Plot saved to {output_png}')
