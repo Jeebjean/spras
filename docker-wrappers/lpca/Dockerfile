@@ -22,8 +22,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # logisticPCA is still on CRAN (last published 2016) and pulls in ggplot2.
-RUN Rscript -e "install.packages('logisticPCA', repos='https://cran.r-project.org')" \
-    && Rscript -e "library(logisticPCA)"
+RUN Rscript -e "install.packages(c('logisticPCA', 'rARPACK'), repos='https://cran.r-project.org')" \
+    && Rscript -e "library(logisticPCA); library(rARPACK)"
 
 COPY run_lpca.R /app/run_lpca.R
 COPY run_cv.R /app/run_cv.R

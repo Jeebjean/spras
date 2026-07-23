@@ -14,7 +14,7 @@ data_matrix = as.matrix(data)
 data_matrix[is.na(data_matrix)] = 0
 
 # Run LPCA
-model = logisticPCA(data_matrix, k = k, m = m)
+model = logisticPCA(data_matrix, k = k, m = m, partial_decomp = TRUE)
 
 # Save scores
 scores = model$PCs
