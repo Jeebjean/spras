@@ -21,6 +21,7 @@ LPCA_WORK_DIR = '/app'
 def run_lpca(
     dataframe: pd.DataFrame,
     output_scores: str,
+    output_matrix: str,
     k: int = 2,
     m: float = 6,
     cv: bool = False,
@@ -31,6 +32,7 @@ def run_lpca(
     algorithm output files.
 
     @param dataframe: binary dataframe of edge comparison between algorithms from summarize_networks
+    @param output_matrix: path to write the binary matrix CSV (used as Docker volume mount)
     @param output_scores: path to write the LPCA PC scores CSV
     @param k: number of principal components (default 2)
     @param m: fixed logisticPCA tuning parameter, used when cv is False
@@ -50,11 +52,11 @@ def run_lpca(
     matrix = matrix.T
     print(f'LPCA: Matrix shape: {matrix.shape}')
 
-    # Step 2: write the matrix next to the outputs, namespaced by algorithm
+    # Step 2: write the binary matrix for Docker volume mount
     output_dir = Path(output_scores).parent
     output_dir.mkdir(parents=True, exist_ok=True)
-    algo_name = Path(output_scores).name.replace('-lpca-scores.csv', '')
-    matrix_path = str(output_dir / f'{algo_name}-lpca_binary_matrix.csv')
+    Path(output_matrix).parent.mkdir(parents=True, exist_ok=True)
+    matrix_path = output_matrix
     matrix.to_csv(matrix_path)
 
     # Step 3: mount the matrix and the scores output
@@ -66,6 +68,7 @@ def run_lpca(
 
     # Step 4: choose m, optionally via cross-validation
     if cv:
+        algo_name = Path(output_scores).name.replace('-lpca-scores.csv', '')
         cv_output_path = str(output_dir / f'{algo_name}-lpca_cv_result.csv')
         bind_path, mapped_cv_output = prepare_volume(cv_output_path, LPCA_WORK_DIR, container_settings)
         volumes.append(bind_path)

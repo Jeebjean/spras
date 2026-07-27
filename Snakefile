@@ -96,6 +96,7 @@ def make_final_input(wildcards):
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-scores.csv',out_dir=out_dir, sep=SEP, dataset=dataset_labels, algorithm=algorithms_mult_param_combos))
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca.png',out_dir=out_dir, sep=SEP,dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-coordinates.txt',out_dir=out_dir, sep=SEP, dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
+        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-binary-matrix.csv',out_dir=out_dir, sep=SEP, dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
 
     if _config.config.analysis_include_ml_aggregate_algo:
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-pca.png',out_dir=out_dir,sep=SEP,dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
@@ -408,19 +409,21 @@ rule ml_analysis_aggregate_algo:
         ml.hac_vertical(summary_df, output.hac_image_vertical, output.hac_clusters_vertical, **hac_params)
         ml.hac_horizontal(summary_df, output.hac_image_horizontal, output.hac_clusters_horizontal, **hac_params)
         ml.pca(summary_df, output.pca_image, output.pca_variance, output.pca_coordinates, **pca_params)
-rule lpca_analysis:
+rrule lpca_analysis:
     input:
         pathways = collect_pathways_per_algo
     output:
         lpca_scores = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca-scores.csv']),
         lpca_png = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca.png']),
-        lpca_coord = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca-coordinates.txt'])
+        lpca_coord = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca-coordinates.txt']),
+        lpca_matrix = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca-binary-matrix.csv'])
     run:
         from spras.analysis import lpca
         summary_df = ml.summarize_networks(input.pathways)
         lpca.run_lpca(
             summary_df,
             output.lpca_scores,
+            output.lpca_matrix,
             k=_config.config.lpca_params.k,
             m=_config.config.lpca_params.m,
             cv=_config.config.lpca_params.cv,
