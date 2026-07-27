@@ -2,15 +2,13 @@
 # Runs LPCA on the binary edge x algorithm matrix produced by summarize_networks.
 # Configured through the analysis.lpca block (k, m, cv, transpose).
 
-from os import PathLike
 from pathlib import Path
-from typing import Iterable, Union
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from spras.analysis.ml import create_palette, summarize_networks
+from spras.analysis.ml import create_palette
 from spras.config.container_schema import ProcessedContainerSettings
 from spras.containers import prepare_volume, run_container_and_log
 
@@ -21,7 +19,7 @@ LPCA_WORK_DIR = '/app'
 
 
 def run_lpca(
-    file_paths: Iterable[Union[str, PathLike]],
+    dataframe: pd.DataFrame,
     output_scores: str,
     k: int = 2,
     m: float = 6,
@@ -32,7 +30,7 @@ def run_lpca(
     Runs Logistic PCA on the binary edge x algorithm matrix built from SPRAS
     algorithm output files.
 
-    @param file_paths: pathway.txt file paths from SPRAS algorithm outputs
+    @param dataframe: binary dataframe of edge comparison between algorithms from summarize_networks
     @param output_scores: path to write the LPCA PC scores CSV
     @param k: number of principal components (default 2)
     @param m: fixed logisticPCA tuning parameter, used when cv is False
@@ -47,8 +45,7 @@ def run_lpca(
         container_settings = ProcessedContainerSettings()
 
     # Step 1: build the binary edge x algorithm matrix
-    print('LPCA: Building binary edge x algorithm matrix...')
-    matrix = summarize_networks(file_paths)
+    matrix = dataframe
     # Transpose so runs are the observations, mirroring the classic PCA analysis
     matrix = matrix.T
     print(f'LPCA: Matrix shape: {matrix.shape}')

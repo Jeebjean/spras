@@ -417,8 +417,9 @@ rule lpca_analysis:
         lpca_coord = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca-coordinates.txt'])
     run:
         from spras.analysis import lpca
+        summary_df = ml.summarize_networks(input.pathways)
         lpca.run_lpca(
-            input.pathways,
+            summary_df,
             output.lpca_scores,
             k=_config.config.lpca_params.k,
             m=_config.config.lpca_params.m,
