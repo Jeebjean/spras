@@ -1,7 +1,7 @@
 # LPCA (Logistic PCA) wrapper
 
 This wrapper runs [logisticPCA](https://github.com/andland/logisticPCA)
-(Landgraf & Lee, 2020) as a SPRAS analysis step. It reduces the binary
+([Landgraf & Lee, 2020](https://doi.org/10.1016/j.jmva.2020.104668)) as a SPRAS analysis step. It reduces the binary
 edge-by-run matrix built from a set of pathway reconstruction outputs to a small
 number of components and reports the proportion of deviance explained.
 

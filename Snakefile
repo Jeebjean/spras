@@ -408,7 +408,6 @@ rule ml_analysis_aggregate_algo:
         ml.hac_vertical(summary_df, output.hac_image_vertical, output.hac_clusters_vertical, **hac_params)
         ml.hac_horizontal(summary_df, output.hac_image_horizontal, output.hac_clusters_horizontal, **hac_params)
         ml.pca(summary_df, output.pca_image, output.pca_variance, output.pca_coordinates, **pca_params)
-
 rule lpca_analysis:
     input:
         pathways = collect_pathways_per_algo

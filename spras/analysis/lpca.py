@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from spras.analysis.ml import summarize_networks
+from spras.analysis.ml import create_palette, summarize_networks
 from spras.config.container_schema import ProcessedContainerSettings
 from spras.containers import prepare_volume, run_container_and_log
 
@@ -42,6 +42,9 @@ def run_lpca(
     @param transpose: if True, run LPCA on the transposed (runs x edges) matrix
         instead of the default (edges x runs)
     @param container_settings: configure the container runtime (Docker or Singularity)
+
+    Note: KDE-based parameter selection (used by PCA) always uses PCA scores, even when LPCA
+    is also enabled. KDE integration with LPCA may be added in a future update.
     """
     if not container_settings:
         container_settings = ProcessedContainerSettings()
@@ -61,7 +64,6 @@ def run_lpca(
     algo_name = Path(output_scores).name.replace('-lpca-scores.csv', '')
     matrix_path = str(output_dir / f'{algo_name}-lpca_binary_matrix.csv')
     matrix.to_csv(matrix_path)
-    print(f'LPCA: Binary matrix saved to {matrix_path}')
 
     # Step 3: mount the matrix and the scores output
     volumes = []
@@ -81,6 +83,11 @@ def run_lpca(
         run_container_and_log('LPCA-CV', LPCA_CONTAINER_SUFFIX, command_cv, volumes,
                               LPCA_WORK_DIR, None, container_settings)
 
+        if not Path(cv_output_path).exists():
+            raise FileNotFoundError(
+                f'LPCA: Cross-validation output not found at {cv_output_path}. '
+                'Check the LPCA Docker container logs for errors.'
+            )
         m_used = pd.read_csv(cv_output_path)['best_m'][0]
         print(f'LPCA: Best m found by CV: {m_used}')
     else:
@@ -115,7 +122,8 @@ def plot_lpca(scores_file: str, output_png: str, output_coord: str, labels: bool
     X = scores.values
     fig, ax = plt.subplots(figsize=(10, 8))
 
-    sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=column_names, s=70, ax=ax)
+    label_color_map = create_palette(column_names)
+    sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=column_names, palette=label_color_map, s=70, ax=ax)
 
     if labels:
         for i, label in enumerate(scores.index):

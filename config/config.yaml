@@ -249,6 +249,8 @@ analysis:
     # evaluation per algorithm will not run unless ml include and ml aggregate_per_algorithm are set to true
     aggregate_per_algorithm: true
   lpca:
+    # if true, runs LPCA in addition to the existing PCA (both analyses will run in parallel).
+    # Running both helps compare the two methods on the same data.
     include: false
     # number of principal components to compute
     k: 2
