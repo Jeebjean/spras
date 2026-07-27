@@ -26,7 +26,6 @@ def run_lpca(
     k: int = 2,
     m: float = 6,
     cv: bool = False,
-    transpose: bool = False,
     container_settings=None
 ) -> None:
     """
@@ -39,8 +38,6 @@ def run_lpca(
     @param m: fixed logisticPCA tuning parameter, used when cv is False
     @param cv: if True, determine m by cross-validation; if False, use the
         fixed m directly (default False)
-    @param transpose: if True, run LPCA on the transposed (runs x edges) matrix
-        instead of the default (edges x runs)
     @param container_settings: configure the container runtime (Docker or Singularity)
 
     Note: KDE-based parameter selection (used by PCA) always uses PCA scores, even when LPCA
@@ -52,10 +49,8 @@ def run_lpca(
     # Step 1: build the binary edge x algorithm matrix
     print('LPCA: Building binary edge x algorithm matrix...')
     matrix = summarize_networks(file_paths)
-
-    # Optionally transpose so the runs become the observations rather than the edges
-    if transpose:
-        matrix = matrix.T
+    # Transpose so runs are the observations, mirroring the classic PCA analysis
+    matrix = matrix.T
     print(f'LPCA: Matrix shape: {matrix.shape}')
 
     # Step 2: write the matrix next to the outputs, namespaced by algorithm

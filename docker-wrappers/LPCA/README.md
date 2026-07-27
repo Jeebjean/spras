@@ -1,5 +1,9 @@
 # LPCA (Logistic PCA) wrapper
 
+Docker image: https://hub.docker.com/r/reedcompbio/lpca
+
+This wrapper runs [logisticPCA](https://github.com/andland/logisticPCA)
+
 This wrapper runs [logisticPCA](https://github.com/andland/logisticPCA)
 ([Landgraf & Lee, 2020](https://doi.org/10.1016/j.jmva.2020.104668)) as a SPRAS analysis step. It reduces the binary
 edge-by-run matrix built from a set of pathway reconstruction outputs to a small
@@ -16,7 +20,6 @@ The analysis is driven by the `analysis.lpca` config block and the
         k: 2             # number of principal components
         m: 6             # fixed logisticPCA tuning parameter, used when cv is false
         cv: false        # true: choose m by cross-validation; false: use the fixed m
-        transpose: false # false: edges x runs; true: runs x edges (mirrors the ml pca analysis)
 
 LPCA only runs for algorithms with multiple parameter combinations, so that the
 binary matrix has more than one column. It also needs a reasonable number of
@@ -52,14 +55,3 @@ Docker Hub organization:
     docker build -t reedcompbio/lpca:v1 docker-wrappers/lpca/
     docker push reedcompbio/lpca:v1
 
-## How SPRAS resolves the image
-
-SPRAS builds the image reference as `<registry.base_url>/<registry.owner>/<tag>`.
-The default is `docker.io/reedcompbio`, combined with the tag `lpca:v1`, so the
-resolved image is `docker.io/reedcompbio/lpca:v1`. The owner is never hardcoded;
-it comes from config.
-
-To test against a local image before it is hosted under `reedcompbio`, tag the
-built image with that name locally (Docker uses a local image without pulling):
-
-    docker tag <your-image> reedcompbio/lpca:v1

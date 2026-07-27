@@ -423,7 +423,6 @@ rule lpca_analysis:
             k=_config.config.lpca_params.k,
             m=_config.config.lpca_params.m,
             cv=_config.config.lpca_params.cv,
-            transpose=_config.config.lpca_params.transpose,
             container_settings=container_settings
         )
         lpca.plot_lpca(

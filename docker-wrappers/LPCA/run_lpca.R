@@ -8,7 +8,7 @@ m = as.numeric(args[4])
 # Load data
 library(logisticPCA)
 data = read.csv(input_file, row.names = NULL)
-party = data[, 1]
+row_labels = data[, 1]
 data = data[, -1]
 data_matrix = as.matrix(data)
 data_matrix[is.na(data_matrix)] = 0
@@ -18,7 +18,7 @@ model = logisticPCA(data_matrix, k = k, m = m, partial_decomp = TRUE)
 
 # Save scores
 scores = model$PCs
-rownames(scores) = party
+rownames(scores) = row_labels
 write.csv(scores, output_file, row.names = TRUE)
 
 # Save deviance explained

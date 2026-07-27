@@ -72,7 +72,6 @@ class LpcaAnalysis(BaseModel):
     k: int = 2
     m: float = 6
     cv: bool = False
-    transpose: bool = False
 
     model_config = ConfigDict(extra='forbid')
 

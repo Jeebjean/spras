@@ -254,11 +254,9 @@ analysis:
     include: false
     # number of principal components to compute
     k: 2
-    # fixed value of the logisticPCA tuning parameter m, used when cv is false
+    # fixed value of the logisticPCA tuning parameter m, used when cv is false.
+    # default of 6 was selected based on cross-validation experiments across multiple
+    # SPRAS algorithms (see https://github.com/Jeebjean/lpca-spras for details)
     m: 6
     # if true, choose m by cross-validation; if false, use the fixed m above
     cv: false
-    # matrix orientation given to LPCA:
-    #   false = edges x runs (observations are the edges)
-    #   true  = runs x edges (observations are the runs, mirroring the classic ml pca analysis)
-    transpose: false
