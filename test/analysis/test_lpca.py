@@ -85,3 +85,41 @@ class TestLpca:
 
         assert png_path.exists(), "LPCA plot PNG was not created"
         assert coord_path.exists(), "LPCA coordinates file was not created"
+
+    def test_lpca_known_output(self):
+        """Test that LPCA produces the expected scores for known inputs.
+
+        Compared in absolute value because LPCA components, like PCA, are only
+        defined up to a sign (an axis can flip without changing the result).
+        """
+        out_path = OUT_DIR / 'lpca-scores-known.csv'
+        matrix_path = OUT_DIR / 'lpca-binary-matrix-known.csv'
+        out_path.unlink(missing_ok=True)
+
+        summary_df = summarize_networks(INPUT_FILES)
+        run_lpca(
+            dataframe=summary_df,
+            output_scores=str(out_path),
+            output_matrix=str(matrix_path),
+            k=2,
+            m=4,
+            cv=False,
+        )
+
+        scores = pd.read_csv(out_path, index_col=0)
+
+        expected = pd.DataFrame({
+            'V1': [4.96756989310632, -7.42875819587666, 12.7488840407735, -11.2979872320273],
+            'V2': [-7.80927209388169, 7.21294742051829, 1.711517188498, -5.51380214217161],
+        })
+
+        assert scores.shape == expected.shape, \
+            f"Expected shape {expected.shape}, got {scores.shape}"
+
+        # Compare in absolute value to stay robust to sign flips (sign non-identifiability)
+        pd.testing.assert_frame_equal(
+            scores.reset_index(drop=True).abs(),
+            expected.abs(),
+            check_dtype=False,
+            atol=1e-4,
+        )
