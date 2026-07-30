@@ -267,6 +267,12 @@ class Config:
         else:
             self.analysis_include_ml_aggregate_algo = False
 
+        # Only run LPCA aggregate per algorithm if analysis include LPCA is set to True
+        if self.analysis_include_lpca and raw_config.analysis.lpca.aggregate_per_algorithm:
+            self.analysis_include_lpca_aggregate_algo = raw_config.analysis.lpca.aggregate_per_algorithm
+        else:
+            self.analysis_include_lpca_aggregate_algo = False
+
         # Raises an error if Evaluation is enabled but no gold standard data is provided
         if self.gold_standards == {} and self.analysis_include_evaluation:
             raise ValueError("Evaluation analysis cannot run as gold standard data not provided. "

@@ -275,7 +275,9 @@ analysis:
   lpca:
     # if true, runs LPCA in addition to the existing PCA (both analyses will run in parallel).
     # Running both helps compare the two methods on the same data.
-    include: false
+    include: true
+    # adds separate LPCA analysis for each algorithm that has multiple parameter combinations
+    aggregate_per_algorithm: false
     # number of principal components to compute
     k: 2
     # fixed value of the logisticPCA tuning parameter m, used when cv is false.

@@ -93,14 +93,16 @@ def make_final_input(wildcards):
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}jaccard-heatmap.png',out_dir=out_dir,sep=SEP,dataset=dataset_labels,algorithm_params=algorithms_with_params))
         
     if _config.config.analysis_include_lpca:
-        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-scores.csv',out_dir=out_dir, sep=SEP, dataset=dataset_labels, algorithm=algorithms_mult_param_combos))
-        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca.png',out_dir=out_dir, sep=SEP,dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
-        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-coordinates.txt',out_dir=out_dir, sep=SEP, dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
-        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-binary-matrix.csv',out_dir=out_dir, sep=SEP, dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}lpca.png',out_dir=out_dir, sep=SEP, dataset=dataset_labels))
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}lpca-scores.csv',out_dir=out_dir, sep=SEP, dataset=dataset_labels))
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}lpca-coordinates.txt',out_dir=out_dir, sep=SEP, dataset=dataset_labels))
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}lpca-binary-matrix.csv',out_dir=out_dir, sep=SEP, dataset=dataset_labels))
+
+    if _config.config.analysis_include_lpca_aggregate_algo:
+        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-scores.csv',out_dir=out_dir, sep=SEP, dataset=dataset_labels, algorithm=algorithms_mult_param_combos))
+        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca.png',out_dir=out_dir, sep=SEP,dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
+        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-coordinates.txt',out_dir=out_dir, sep=SEP, dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
+        final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-lpca-binary-matrix.csv',out_dir=out_dir, sep=SEP, dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
 
     if _config.config.analysis_include_ml_aggregate_algo:
         final_input.extend(expand('{out_dir}{sep}{dataset}-ml{sep}{algorithm}-pca.png',out_dir=out_dir,sep=SEP,dataset=dataset_labels,algorithm=algorithms_mult_param_combos))
@@ -422,6 +424,32 @@ rule lpca_analysis_all:
         lpca_png = SEP.join([out_dir, '{dataset}-ml', 'lpca.png']),
         lpca_coord = SEP.join([out_dir, '{dataset}-ml', 'lpca-coordinates.txt']),
         lpca_matrix = SEP.join([out_dir, '{dataset}-ml', 'lpca-binary-matrix.csv'])
+    run:
+        from spras.analysis import lpca
+        summary_df = ml.summarize_networks(input.pathways)
+        lpca.run_lpca(
+            summary_df,
+            output.lpca_scores,
+            output.lpca_matrix,
+            k=_config.config.lpca_params.k,
+            m=_config.config.lpca_params.m,
+            cv=_config.config.lpca_params.cv,
+            container_settings=container_settings
+        )
+        lpca.plot_lpca(
+            output.lpca_scores,
+            output.lpca_png,
+            output.lpca_coord
+        )
+
+rule lpca_analysis_aggregate_algo:
+    input:
+        pathways = collect_pathways_per_algo
+    output:
+        lpca_scores = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca-scores.csv']),
+        lpca_png = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca.png']),
+        lpca_coord = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca-coordinates.txt']),
+        lpca_matrix = SEP.join([out_dir, '{dataset}-ml', '{algorithm}-lpca-binary-matrix.csv'])
     run:
         from spras.analysis import lpca
         summary_df = ml.summarize_networks(input.pathways)

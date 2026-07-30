@@ -69,6 +69,7 @@ class EvaluationAnalysis(BaseModel):
 
 class LpcaAnalysis(BaseModel):
     include: bool
+    aggregate_per_algorithm: bool = False
     k: int = 2
     m: float = 6
     cv: bool = False

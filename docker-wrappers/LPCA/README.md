@@ -4,7 +4,6 @@ Docker image: https://hub.docker.com/r/reedcompbio/lpca
 
 This wrapper runs [logisticPCA](https://github.com/andland/logisticPCA)
 
-This wrapper runs [logisticPCA](https://github.com/andland/logisticPCA)
 ([Landgraf & Lee, 2020](https://doi.org/10.1016/j.jmva.2020.104668)) as a SPRAS analysis step. It reduces the binary
 edge-by-run matrix built from a set of pathway reconstruction outputs to a small
 number of components and reports the proportion of deviance explained.
@@ -25,6 +24,19 @@ LPCA only runs for algorithms with multiple parameter combinations, so that the
 binary matrix has more than one column. It also needs a reasonable number of
 observations to be meaningful; very small inputs (such as the bundled example
 datasets) produce degenerate results, which is why it is disabled by default.
+
+  ### `partial_decomp`
+
+  The LPCA wrapper always runs `logisticSVD` with `partial_decomp = TRUE`, which
+  uses a truncated (rARPACK-based) decomposition instead of a full one. This is
+  hardcoded rather than exposed as a parameter:
+
+  - On small datasets it has no practical effect on the result.
+  - On large datasets it is required to avoid out-of-memory (OOMKilled) errors
+    that occur with the full decomposition.
+
+  Because it is beneficial on large inputs and harmless on small ones, it is
+  enabled unconditionally and is not a user-facing configuration option.
 
 ## Scripts
 
